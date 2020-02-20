@@ -1,0 +1,39 @@
+
+// Fonts
+@import url('https://fonts.googleapis.com/css?family=Nunito');
+
+// Variables
+@import 'variables';
+
+@import 'custom';
+
+@import '~font-awesome/scss/font-awesome';
+
+// Bootstrap
+@import '~bootstrap/scss/bootstrap';
+
+.navbar-laravel {
+  background-color: $primary;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+.navbar-nav .nav-link
+{
+color: white !important;
+}
+
+.navbar-brand
+{
+    color: white !important;
+}
+.btn{
+border-radius: 0px;
+}
+
+/*.form-control{
+    border-radius: 0px;
+}
+*/
+
+.card-header{
+    border-bottom: none;
+}
