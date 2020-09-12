@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Comment;
 use App\Forum;
 use App\Thread;
-use App\Comment;
+use Illuminate\Http\Request;
+
 class DbController extends Controller
 {
     /**
@@ -25,10 +26,11 @@ class DbController extends Controller
      */
     public function index()
     {
-        $forums=Forum::orderBy('id', 'DESC')->take(1)->get();
-        $comments=Comment::orderBy('id', 'DESC')->take(1)->get();
-        $threads=Thread::orderBy('created_at', 'DESC')->take(1)->get();
-        $mythreads=Thread::where('author', auth()->user()->name)->orderBy('created_at', 'DESC')->paginate(5);
-        return view('dashboard', compact('secs', 'forums', 'threads', 'mythreads'));
+        $forums = Forum::orderBy('id', 'DESC')->take(1)->get();
+        $comments = Comment::orderBy('id', 'DESC')->take(1)->get();
+        $threads = Thread::orderBy('created_at', 'DESC')->take(1)->get();
+        $mythreads = Thread::where('author', auth()->user()->name)->orderBy('created_at', 'DESC')->paginate(5);
+
+        return view('dashboard', compact('forums', 'threads', 'mythreads'));
     }
 }

@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class CreateCommentsTable extends Migration
 {
@@ -19,6 +19,7 @@ class CreateCommentsTable extends Migration
             $table->string('message');
             $table->integer('threadid');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

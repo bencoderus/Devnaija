@@ -2,10 +2,10 @@
 
 namespace App;
 
-use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
@@ -17,9 +17,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $date = ['deleted_at', 'last_seen'];
-    protected $fillable = [
-        'name', 'email', 'password',
-    ];
+    protected $guarded = ["id"];
 
     /**
      * The attributes that should be hidden for arrays.
@@ -30,22 +28,22 @@ class User extends Authenticatable
         'password', 'remember_token',
     ];
 
-    function thread()
+    public function thread()
     {
         return $this->hasMany('App\Thread', 'author', 'name');
     }
 
-    function like()
+    public function like()
     {
         return $this->hasMany('App\Post', 'user', 'name');
     }
 
-    function message()
+    public function message()
     {
         return $this->hasMany('App\Message', 'reciever', 'name');
     }
 
-    function post()
+    public function post()
     {
         return $this->hasMany('App\Post', 'user', 'name');
     }

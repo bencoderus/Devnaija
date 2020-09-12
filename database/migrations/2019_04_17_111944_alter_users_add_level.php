@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class AlterUsersAddLevel extends Migration
 {
@@ -16,9 +16,9 @@ class AlterUsersAddLevel extends Migration
         Schema::table('users', function (Blueprint $table) {
             $table->integer('level')->default(1);
             $table->integer('ban')->default(0);
-            $table->string('photo');
-            $table->string('mobileno');
-            $table->string('bio');
+            $table->string('photo')->nullable();
+            $table->string('mobileno')->nullable();
+            $table->string('bio')->nullable();
         });
     }
 
@@ -31,11 +31,11 @@ class AlterUsersAddLevel extends Migration
     {
         //
         Schema::table('users', function (Blueprint $table) {
-        $table->dropColumn('level');
-        $table->dropColumn('ban');
-        $table->dropColumn('photo');
-        $table->dropColumn('mobileno');
-        $table->dropColumn('bio');
-    });
+            $table->dropColumn('level');
+            $table->dropColumn('ban');
+            $table->dropColumn('photo');
+            $table->dropColumn('mobileno');
+            $table->dropColumn('bio');
+        });
     }
 }

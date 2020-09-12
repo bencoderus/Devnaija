@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class CreateThreadsTable extends Migration
 {
@@ -23,6 +23,7 @@ class CreateThreadsTable extends Migration
             $table->string('locked')->default(0);
             $table->integer('forumid');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

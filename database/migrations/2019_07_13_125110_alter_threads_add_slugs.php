@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class AlterThreadsAddSlugs extends Migration
 {
@@ -13,8 +13,8 @@ class AlterThreadsAddSlugs extends Migration
      */
     public function up()
     {
-        Schema::table('threads', function(Blueprint $table){
-        $table->string('slug')->nullable();
+        Schema::table('threads', function (Blueprint $table) {
+            $table->string('slug')->nullable();
         });
     }
 
@@ -26,8 +26,8 @@ class AlterThreadsAddSlugs extends Migration
     public function down()
     {
         //
-        Schema::table('threads', function(Blueprint $table){
+        Schema::table('threads', function (Blueprint $table) {
             $table->dropColumn('slug');
-            });
+        });
     }
 }

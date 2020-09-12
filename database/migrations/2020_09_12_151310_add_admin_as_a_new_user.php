@@ -1,10 +1,11 @@
 <?php
 
+use App\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateSectionsTable extends Migration
+class AddAdminAsANewUser extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +14,12 @@ class CreateSectionsTable extends Migration
      */
     public function up()
     {
-        Schema::create('sections', function (Blueprint $table) {
-            $table->increments('id');
-            $table->string('name');
-            $table->timestamps();
-            $table->softDeletes();
-        });
+        User::create([
+            'name' => 'Admin',
+            'level' => 3,
+            'email' => 'admin@mail.com',
+            'password' => \Hash::make("password"),
+        ]);
     }
 
     /**
@@ -28,6 +29,6 @@ class CreateSectionsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('sections');
+        User::first()->delete();
     }
 }

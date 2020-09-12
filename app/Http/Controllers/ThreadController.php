@@ -2,21 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\forum;
 use App\comment;
-use App\thread;
+use App\forum;
 use App\Likepost;
-use App\Post;
 use App\Notification;
+use App\Post;
+use App\thread;
+use Illuminate\Http\Request;
 
 class ThreadController extends Controller
 {
 
-public function __construct()
-{
-$this->middleware('auth', ['except'=>'show']);
-}
+    public function __construct()
+    {
+        $this->middleware('auth', ['except' => 'show']);
+    }
     /**
      * Display a listing of the resource.
      *
@@ -27,8 +27,6 @@ $this->middleware('auth', ['except'=>'show']);
         //
     }
 
-
-
     /**
      * Show the form for creating a new resource.
      *
@@ -36,8 +34,9 @@ $this->middleware('auth', ['except'=>'show']);
      */
     public function create($id)
     {
-        $forum=Forum::findOrFail($id);
+        $forum = Forum::findOrFail($id);
         //returning forum details
+
         return view('forum.create')->with('forum', $forum);
     }
 
@@ -49,43 +48,41 @@ $this->middleware('auth', ['except'=>'show']);
      */
     public function store(Request $request)
     {
-        $this->validate($request,[
-            'title'=>'required|min:4|unique:threads',
-            'body'=>'required|min:5',
-            'image'=>'nullable|image|max:1999'
-            ]);
-            if($request->hasFile('image'))
-{
-$file=$request->file('image')->getClientOriginalName();
-$ext=$request->file('image')->getClientOriginalExtension();
-$filename=pathinfo($file, PATHINFO_FILENAME);
-$filenew='image'.time().'.'.$ext;
-$path=$request->file('image')->storeAs('public/uploads', $filenew);
-}
-else
-{
-    $filenew="nophoto.jpg";
-}
-$thread=new Thread;
-    $thread->title=$request->input('title');
+        $this->validate($request, [
+            'title' => 'required|min:4|unique:threads',
+            'body' => 'required|min:5',
+            'image' => 'nullable|image|max:1999',
+        ]);
+        if ($request->hasFile('image')) {
+            $file = $request->file('image')->getClientOriginalName();
+            $ext = $request->file('image')->getClientOriginalExtension();
+            $filename = pathinfo($file, PATHINFO_FILENAME);
+            $filenew = 'image' . time() . '.' . $ext;
+            $path = $request->file('image')->storeAs('public/uploads', $filenew);
+        } else {
+            $filenew = "nophoto.jpg";
+        }
+        $thread = new Thread;
+        $thread->title = $request->input('title');
 
-    $thread->body=$request->input('body');
-    $thread->photo=$filenew;
-    $thread->forumid=$request->input('forumid');
-    $thread->author=$request->input('author');
-    $thid = $thread->id;
-    $thread->slug=getslug($request->input('title'));
-    $thread->save();
-//fetching id of the recently created thread
-    $thread2=Thread::where('author', auth()->user()->name)->orderBy('id', 'DESC')->first();
-    $tid=$thread2->id;
-    $post = new Post;
-    $post->user= auth()->user()->name;
-    $post->message = $request->input('body');
-    $post->threadid = $tid;
-    $post->type = "thread";
-    $post->save();
-return redirect('/thread/' .$tid)->with('success', 'New Thread Added Successfully!');
+        $thread->body = $request->input('body');
+        $thread->photo = $filenew;
+        $thread->forumid = $request->input('forumid');
+        $thread->author = $request->input('author');
+        $thid = $thread->id;
+        $thread->slug = getslug($request->input('title'));
+        $thread->save();
+        // fetching id of the recently created thread
+        $thread2 = Thread::where('author', auth()->user()->name)->orderBy('id', 'DESC')->first();
+        $tid = $thread2->id;
+        $post = new Post;
+        $post->user = auth()->user()->name;
+        $post->message = $request->input('body');
+        $post->threadid = $tid;
+        $post->type = "thread";
+        $post->save();
+
+        return redirect('/thread/' . $post->slug)->with('success', 'New Thread Added Successfully!');
 
     }
 
@@ -96,28 +93,29 @@ return redirect('/thread/' .$tid)->with('success', 'New Thread Added Successfull
      * @return \Illuminate\Http\Response
      */
 /*
-    public function show($slug)
-    {
+public function show($slug)
+{
 //        $thread=Thread::findOrFail($id);
-        $thread = Thread::where('slug', $slug)->firstOrFail();
-        $thread->views+=1;
+$thread = Thread::where('slug', $slug)->firstOrFail();
+$thread->views+=1;
 
-        //returning comments
-        $posts=Post::where('threadid', $id)->orderBy('created_at', 'ASC')->paginate(10);
-        $thread->save();
-        return view('forum.showtopic', compact('thread','posts'));
-    }
-*/
+//returning comments
+$posts=Post::where('threadid', $id)->orderBy('created_at', 'ASC')->paginate(10);
+$thread->save();
+return view('forum.showtopic', compact('thread','posts'));
+}
+ */
 
     public function show($slug)
     {
         $thread = Thread::where('slug', $slug)->firstOrFail();
-        $thread->views+=1;
+        $thread->views += 1;
 
         //returning comments
-        $posts=Post::where('threadid', $thread->id)->orderBy('created_at', 'ASC')->paginate(10);
+        $posts = Post::where('threadid', $thread->id)->orderBy('created_at', 'ASC')->paginate(10);
         $thread->save();
-        return view('forum.showthread', compact('thread','posts'));
+
+        return view('forum.showthread', compact('thread', 'posts'));
     }
 
     /**
@@ -128,16 +126,15 @@ return redirect('/thread/' .$tid)->with('success', 'New Thread Added Successfull
      */
     public function edit($id)
     {
-    $thread=Thread::findOrFail($id);
+        $thread = Thread::findOrFail($id);
 //validating who can edit thread
-if($thread->author == auth()->user()->name || auth()->user()->level == 3)
-{
-    $post=Post::where('threadid', $id)->first();
-    return view('forum.edit', compact('thread', 'post'));
-}else
-{
-   return redirect('/thread/' .$id)->with('error', 'Authorized action!');
-}
+        if ($thread->author == auth()->user()->name || auth()->user()->level == 3) {
+            $post = Post::where('threadid', $id)->first();
+
+            return view('forum.edit', compact('thread', 'post'));
+        } else {
+            return redirect('/thread/' . $id)->with('error', 'Authorized action!');
+        }
     }
 
     /**
@@ -150,39 +147,35 @@ if($thread->author == auth()->user()->name || auth()->user()->level == 3)
     public function update(Request $request)
     {
 
-        $this->validate($request,[
-            'title'=>'required|min:4',
-            'body'=>'required|min:5',
-            'image'=>'nullable|image|max:1999'
-            ]);
-            $id=$request->input('threadid');
-            $pid=$request->input('postid');
-            $thread=Thread::find($id);
-            if($request->hasFile('image'))
-{
-$file=$request->file('image')->getClientOriginalName();
-$ext=$request->file('image')->getClientOriginalExtension();
-$filename=pathinfo($file, PATHINFO_FILENAME);
-$filenew='image'.time().'.'.$ext;
-$path=$request->file('image')->storeAs('public/uploads', $filenew);
-}
-else
-{
-    $filenew=$thread->photo;
-}
-    $thread->title=$request->input('title');
-    $thread->body=$request->input('body');
+        $this->validate($request, [
+            'title' => 'required|min:4',
+            'body' => 'required|min:5',
+            'image' => 'nullable|image|max:1999',
+        ]);
+        $id = $request->input('threadid');
+        $pid = $request->input('postid');
+        $thread = Thread::find($id);
+        if ($request->hasFile('image')) {
+            $file = $request->file('image')->getClientOriginalName();
+            $ext = $request->file('image')->getClientOriginalExtension();
+            $filename = pathinfo($file, PATHINFO_FILENAME);
+            $filenew = 'image' . time() . '.' . $ext;
+            $path = $request->file('image')->storeAs('public/uploads', $filenew);
+        } else {
+            $filenew = $thread->photo;
+        }
+        $thread->title = $request->input('title');
+        $thread->body = $request->input('body');
 
-    $thread->slug=getslug($request->input('title'));
-    $thread->photo=$filenew;
-    $thread->save();
+        $thread->slug = getslug($request->input('title'));
+        $thread->photo = $filenew;
+        $thread->save();
 
-    $post=Post::find($pid);
-    $post->message = $request->input('body');
-    $post->save();
+        $post = Post::find($pid);
+        $post->message = $request->input('body');
+        $post->save();
 
-return redirect('/thread/' .$id)->with('success', 'Changes Updated Successfully!');
-
+        return redirect('/thread/' . $thread->slug)->with('success', 'Changes Updated Successfully!');
 
     }
 
@@ -195,88 +188,89 @@ return redirect('/thread/' .$id)->with('success', 'Changes Updated Successfully!
     public function destroy($id)
     {
 
-        if(auth()->user()->level > 1)
-        {
+        if (auth()->user()->level > 1) {
             $post = Thread::findOrFail($id);
             $fid = $post->forumid;
             $post->delete();
-            return redirect('/forum/' .$fid)->with('success', 'Thread was removed successfully');
-        }else
-        {
-           return redirect('/thread/' .$id)->with('error', 'Authorized action!');
+
+            return redirect('/forum/' . $fid)->with('success', 'Thread was removed successfully');
+        } else {
+            return redirect('/thread/' . $id)->with('error', 'Authorized action!');
         }
 
-
         $post = Thread::findOrFail($id);
-     $fid = $post->forumid;
-     $post->delete();
-     return redirect('/forum/' .$fid)->with('success', 'Thread was removed successfully');
+        $fid = $post->forumid;
+        $post->delete();
+
+        return redirect('/forum/' . $fid)->with('success', 'Thread was removed successfully');
     }
 
     public function lock(Request $request)
     {
-        $id=$request->input('id');
-        $thread=Thread::find($id);
-        $thread->locked=1;
+        $id = $request->input('id');
+        $thread = Thread::find($id);
+        $thread->locked = 1;
         $thread->save();
-        return redirect('/thread/'.$thread->slug)->with('success', 'Comment has been disabled!');
+
+        return redirect('/thread/' . $thread->slug)->with('success', 'Comment has been disabled!');
     }
     public function unlock(Request $request)
     {
-        $id=$request->input('id');
-        $thread=Thread::find($id);
-        $thread->locked=0;
+        $id = $request->input('id');
+        $thread = Thread::find($id);
+        $thread->locked = 0;
         $thread->save();
-        return redirect('/thread/'.$thread->slug)->with('success', 'Comment has been enabled!');
+
+        return redirect('/thread/' . $thread->slug)->with('success', 'Comment has been enabled!');
     }
 
 //likes
-public function like(Request $request)
-{
-    $id=$request->input('pid');
-    $tid=$request->input('tid');
-    $like= new Likepost;
-    $like->user=auth()->user()->name;
-    $like->pid=$id;
-    $like->save();
-
-    //add notification
-    $thread = Thread::find($tid);
-    $post = Post::find($id);
-    if(auth()->user()->name != $post->user)
+    public function like(Request $request)
     {
-    $notify = new Notification;
-    $notify->user = $post->user;
-    $notify->message =auth()->user()->name ." just liked your post in " .$thread->title;
-    $notify->save();
+        $id = $request->input('pid');
+        $tid = $request->input('tid');
+        $like = new Likepost;
+        $like->user = auth()->user()->name;
+        $like->pid = $id;
+        $like->save();
+
+        //add notification
+        $thread = Thread::find($tid);
+        $post = Post::find($id);
+        if (auth()->user()->name != $post->user) {
+            $notify = new Notification;
+            $notify->user = $post->user;
+            $notify->message = auth()->user()->name . " just liked your post in " . $thread->title;
+            $notify->save();
+        }
+
+        return redirect("/thread/" . $tid . "#p" . $id)->with('success', 'Like added!');
     }
-    return redirect("/thread/" .$tid ."#p" .$id)->with('success', 'Like added!');
-}
 
-public function unlike(Request $request)
-{
-    $id=$request->input('pid');
-    $tid=$request->input('tid');
-    $like=Likepost::where('pid', $id)->where('user', auth()->user()->name)->firstOrFail();
-    $like->delete();
-    return redirect("/thread/" .$tid ."#p" .$id)->with('success', 'Thread Unlike!');
-}
+    public function unlike(Request $request)
+    {
+        $id = $request->input('pid');
+        $tid = $request->input('tid');
+        $like = Likepost::where('pid', $id)->where('user', auth()->user()->name)->firstOrFail();
+        $like->delete();
 
-public function search()
-{
-    return view('forum.search');
-}
+        return redirect("/thread/" . $tid . "#p" . $id)->with('success', 'Thread Unlike!');
+    }
 
+    public function search()
+    {
+        return view('forum.search');
+    }
 
-public function find(Request $request)
-{
-$this->validate($request, [
-    'search'=>'required|string|min:3|max:30'
-]);
-$search = $request->input('search');
+    public function find(Request $request)
+    {
+        $this->validate($request, [
+            'search' => 'required|string|min:3|max:30',
+        ]);
+        $search = $request->input('search');
 //$thread = Thread::where('title', 'like', '%$search%')->get();
-return redirect('/forum/search')->with('search', $search);
-}
 
+        return redirect('/forum/search')->with('search', $search);
+    }
 
 }
